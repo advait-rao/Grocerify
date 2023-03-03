@@ -14,7 +14,7 @@ from config import SPOTIFY_REDIRECT_URI as spotify_redirect_uri
 
 #============================== METHOD DEFINITIONS ==============================
 
-def setup_client():
+def setup_evernote_client():
     # Set up the Evernote client
     client = EvernoteClient(token=evernote_developer_token, sandbox=True)
     print("Client set up complete")
@@ -52,6 +52,7 @@ def get_notebook():
     raise ValueError(f"Notebook '{NOTEBOOK_NAME}' not found.")
     
 def get_list_from_evernote():
+    # Returns  list_name(str), list()
     notebook = get_notebook()
 
     # Set up the NoteFilter to search for notes with the specified title
@@ -65,38 +66,60 @@ def get_list_from_evernote():
     if (note):
         # Create list of strings if note is found
         item_list = create_list(note)
-        return item_list
+        return note.title, item_list
     else:
         print('Note not found')
         return
 
-def create_playlist():
+def setup_spotify_client():
     # Set up the Spotify API client
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id= spotify_client_id,
-                                                client_secret=spotify_client_secret,
-                                                redirect_uri=spotify_redirect_uri,
-                                                scope='playlist-modify-public'))
+    client = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id= spotify_client_id,
+                                                       client_secret=spotify_client_secret,
+                                                       redirect_uri=spotify_redirect_uri,
+                                                       scope='playlist-modify-public'
+                                                       ))
+    return client
 
-    # Create the new playlist
-    playlist_name = 'My New Playlist'
-    playlist_description = 'This is my new playlist!'
-    user_id = sp.me()['id']
-    playlist = sp.user_playlist_create(user_id, playlist_name, public=True, description=playlist_description)
+def get_tracks(shopping_list: list):
+    # Returns a list of track URIs
+    track_list = []
+    for item in shopping_list:
+        track_name = item
+        results = SPOTIFY_CLIENT.search(q=track_name, type='track', limit = 50)
+        track_uri = results['tracks']['items'][0]['uri']
+        print(results['tracks']['items'][0]['name'])
+        track_list.append(track_uri)
+    
 
+    return track_list
+
+def add_tracks(track_uris: list, playlist ):
     # Add tracks to the playlist
-    track_uris = ['spotify:track:4iV5W9uYEdYUVa79Axb7Rh', 'spotify:track:2takcwOaAZWiXQijPHIx7B']
-    sp.playlist_add_items(playlist['id'], track_uris)
+    SPOTIFY_CLIENT.playlist_add_items(playlist['id'], track_uris)
+    print(f'Added {len(track_uris)} tracks to the playlist.')
+    return
+    
+def create_playlist(list_name: str, shopping_list: list):
+    
+    track_uris = get_tracks(shopping_list)
+    # Create the new playlist
+    playlist_name = list_name
+    playlist_description = (f'Playlist from note "{playlist_name}"')
+    user_id = SPOTIFY_CLIENT.me()['id']
+    playlist = SPOTIFY_CLIENT.user_playlist_create(user_id, playlist_name, public=True, description=playlist_description)
+
+    add_tracks(track_uris, playlist)
 
     print(f"Playlist '{playlist_name}' created!")
 
 #============================== SCRIPT ==============================
 
-CLIENT = setup_client()
-NOTE_STORE = CLIENT.get_note_store()
+EVERNOTE_CLIENT = setup_evernote_client()
+NOTE_STORE = EVERNOTE_CLIENT.get_note_store()
 NOTEBOOK_NAME = input("Enter the name of your notebook: ")
-shopping_list = get_list_from_evernote()
-create_playlist()
-#print(shopping_list)
-#create_playlist(shopping_list)
+list_name, shopping_list = get_list_from_evernote()
+print(shopping_list)
+SPOTIFY_CLIENT = setup_spotify_client()
+create_playlist(list_name, shopping_list)
 
 
