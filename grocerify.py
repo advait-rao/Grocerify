@@ -41,6 +41,7 @@ def find_note(note_list):
         return False
 
 def get_notebook():
+    # Get the notebook from the note_store object
     notebooks = NOTE_STORE.listNotebooks()
 
     for notebook in notebooks:
@@ -52,6 +53,7 @@ def get_notebook():
     raise ValueError(f"Notebook '{NOTEBOOK_NAME}' not found.")
     
 def get_list_from_evernote():
+    # Get the shopping list from the note
     # Returns  list_name(str), list()
     notebook = get_notebook()
 
@@ -103,8 +105,8 @@ def create_playlist(list_name: str, shopping_list: list):
     
     track_uris = get_tracks(shopping_list)
     # Create the new playlist
-    playlist_name = list_name
-    playlist_description = (f'Playlist from note "{playlist_name}"')
+    playlist_name = list_name + ' Shopping'
+    playlist_description = (f'Shopping playlist from Evernote')
     user_id = SPOTIFY_CLIENT.me()['id']
     playlist = SPOTIFY_CLIENT.user_playlist_create(user_id, playlist_name, public=True, description=playlist_description)
 
