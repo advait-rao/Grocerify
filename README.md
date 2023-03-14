@@ -1,6 +1,6 @@
 # Grocerify
 
-Grocerify is a Python application that reads your shopping list from Evernote and creates a Spotify playlist comprising of the items on your shopping list.
+Grocerify is a Python application that reads your shopping list from Evernote and creates a Spotify playlist based on the items on your shopping list. It takes into account your spotify listening profile to pick songs that you're likely to enjoy and haven't heard before.
 
 ## How it works
 
@@ -47,7 +47,8 @@ python3 grocerify.py
 
 ### Future improvements
 
-The app could be improved by adding a user interface that allows the user to create and edit the shopping list within the app, without having to access Evernote separately. The app could also ask for the user's music taste and prioritize songs that fit that genre. I will be implementing a feature that stores a record of songs the user has added to playlists already and prioritise adding new songs.
+The app could be improved by adding a user interface that allows the user to create and edit the shopping list within the app, without having to access Evernote separately.
+It runs with the developer version of Evernote, and I'd have to submit the application for review to get it running on the production version. You'd have to persuade me.
 
 ### Contributing
 
